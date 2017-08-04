@@ -74,7 +74,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         background-color: white;
       }
 
-      
+
 
     </style>
     <canvas id="canvas" ></canvas>
@@ -137,16 +137,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 
     _selectedPhotoChanged(){
-      
+
       var self = this;
       var index = this.getSeletedPhotoIndex();
       if(index!=this.photos.length-1){
-        
+
         self.nextPhoto = self.photos[index+1];
-        
+
       }
       if(index!=0){
-        
+
         self.prevPhoto = self.photos[index-1];
         
       }
@@ -170,7 +170,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
 
           toggleFooter(){
-           
+
             var footer = this.$.footer;
             var glass = this.$.glass;
 
@@ -224,7 +224,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               }
 
               this.viewMode = !this.viewMode;
-              
+
 
             }  
           }
@@ -233,16 +233,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             var track = this.$.imageTrack;
             switch(e.detail.state) {
               case 'start':
-              
+
               break;
               case 'track':
               if(this.status =="dragging")
                 return;
               track.style.left = e.detail.dx +"px";
-              
+
               break;
               case 'end':
-              
+
               if(e.detail.dx >= screen.width/3)
                 this.movePrev(track,e.detail.dx);
               else if(e.detail.dx <= -1 * screen.width/3)
@@ -255,21 +255,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
           getSeletedPhotoIndex(){
             return this.photos.map((e)=>e.url).indexOf(this.selectedPhoto.url);
-            
+
           }
 
           moveNext(target,dx){
             if(this.status == "dragging")
               return;
             var self = this;
-            
+
             var next = target.animate(
               [
               {transform:"translateX("+(-1*screen.width)+"px)"},
               {transform:"translateX("+(-2*screen.width-dx)+"px)"}
               ],{duration:300,easing:"ease-in-out"}
               );
-            
+
             next.onfinish = function(){
 
               target.style.left = "0px";
@@ -287,7 +287,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       movePrev(target,dx){
         if(this.status == "dragging")
           return;
-        
+
         var self = this;
         var prev = target.animate(
           [
@@ -295,7 +295,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           {transform:"translateX("+(-1*screen.width + dx/2)+"px)"}
           ],{duration:300,easing:"ease-in-out"}
           );
-        
+
         prev.onfinish = function(){
           target.style.left = "0px";
           var index = self.getSeletedPhotoIndex();
@@ -309,7 +309,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       stay(target,dx){
         if(this.status == "dragging")
           return;
-        
+
         
 
         var restore = target.animate(
@@ -357,15 +357,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
              movePhoto(this.$.detailPhoto,e.detail.dx,e.detail.dy,e.detail.ddx,e.detail.ddy);
              break;
              case 'end':
-             
+
              //console.log('Tracking ended!');
              if(self.status == "swiping"){
               self.status = "end";
               return;
             }
             
-            if(self.status == "dragging" && Math.abs(e.detail.dy) <= 20){
-              
+            if(self.status == "dragging" && Math.abs(e.detail.dy) <= 30){
+
               self.status = "end";
               self.stayForDragging(this.$.detailPhoto,e.detail.dx,e.detail.dy);
               self.$.detailPhoto.nextSibling.nextSibling.style.opacity = 1;
@@ -373,7 +373,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               self.$.glass.style.opacity = 1;
               return;
             }
-            
+
             this.zoomOut(this.$.detailPhoto,e.detail.dx,function(){
              window.location.href="#/view1";
              self.status = "end";
@@ -403,13 +403,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             var oldTransform = self.photoTransition.to.transform;
             oldTransform = oldTransform.substring(oldTransform.indexOf('(')+1,oldTransform.indexOf(')'))+",";
             var newTransform = oldTransform.split("px,");
-            
+
             self.set('photoTransition.to.transform',"translate("+(Number(newTransform[0])+ddx)+"px,"+(Number(newTransform[1])+ddy)+"px)");
 
-            
 
 
-            if(Math.abs(dy)>=20){
+
+            if(Math.abs(dy)>=30){
 
               self.backIndication(true);
             }else{
@@ -418,8 +418,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
 
           function movePhoto(target,dx,dy,ddx,ddy){
-            
-            if(ddy<=5&&ddy>=-5&&self.status!="dragging"){
+
+            if(ddy<=10&&ddy>=-10&&self.status!="dragging"){
               self.status = "swiping";
               swipePhoto(target,dx,dy,ddx,ddy);
             }
@@ -428,7 +428,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               dragPhoto(target,dx,dy,ddx,ddy);
             }
 
-            
+
             
             
           }
@@ -437,27 +437,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         backIndication(isHiding, dy){
           if(isHiding){
-           
+
             if(this.viewMode == false){
-              
+
             }else{
 
               return;
             }
-            
+
           }
           else{
-           
+
            if(this.viewMode == true){       
-            
+
            }else{
              return;
-             
+
            }
          }
 
          var footer = this.$.footer;
-         
+
          if(!this.viewMode){
           var hidding = footer.animate(
             [
@@ -468,7 +468,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               duration:200
             });
 
-          
+
 
           hidding.onfinish = function(){
             footer.style.transform = "translateY(65px)";
@@ -486,22 +486,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               duration:200
             });
 
-          
+
 
           hidding.onfinish = function(){
             footer.style.transform = "translateY(0)";
           }
 
           this.viewMode = !this.viewMode;
-          
+
 
         } 
       }
 
-      
+
 
       zoomOut(target, dx, callback){
-       
+
        if(!this.photoTransition){
         callback();
         return;
@@ -540,7 +540,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           duration:200,
           easing:"ease-in-out"
         }
-        
+
         );
 
         
@@ -559,27 +559,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       generateScreenShot(){
-        
-        
+
+
         var self = this;
         this.$.canvas.width= screen.width;
         this.$.canvas.height = screen.height;
         var ctx = this.$.canvas.getContext('2d');
-        
+
         this.photos.forEach(function(e){
                   var img = new Image(); //creates a variable for a new image
                   img.src = e.url;
                   img.onload = function() {
-                    
+
                     if(!e.position||e.url == self.selectedPhoto.url){
                       return;
                     }
-                    
+
                     ctx.drawImage(img, e.position.left, e.position.top, (e.position.right - e.position.left),(e.position.bottom-e.position.top));// draws the image at the specified x and y location
                   }
                 });
-        
-        
+
+
       }
 
     }
