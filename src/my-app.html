@@ -1,0 +1,379 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="my-icons.html">
+
+<link rel="lazy-import" href="my-view1.html">
+<link rel="lazy-import" href="my-view2.html">
+<link rel="lazy-import" href="my-view3.html">
+<link rel="lazy-import" href="my-view404.html">
+
+<link rel="import" href="../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html" rel="import">
+<link rel="import" href="../bower_components/neon-animation/web-animations.html">
+<link rel="import" href="../bower_components/polymer/lib/mixins/gesture-event-listeners.html">
+
+<dom-module id="my-app">
+  <template>
+    <style>
+      :host {
+        --app-primary-color: white;
+        --app-secondary-color: black;
+        display: block;
+        
+
+      }
+
+      app-header-layout{
+        position:fixed;
+        top:0;
+        left:0;
+        width: 100vw;
+      }
+
+      app-drawer-layout:not([narrow]) [drawer-toggle] {
+        display: none;
+
+      }
+
+      app-header {
+        color: #444;
+        background-color: rgba(252, 252, 252,1);
+        border-bottom: 1px #eee solid;
+      }
+
+      app-header paper-icon-button {
+        --paper-icon-button-ink-color: white;
+      }
+
+      .drawer-list {
+        margin: 0 20px;
+      }
+
+      .drawer-list a {
+        display: block;
+        padding: 0 16px;
+        text-decoration: none;
+        color: var(--app-secondary-color);
+        line-height: 40px;
+      }
+
+      .drawer-list a.iron-selected {
+        color: black;
+        font-weight: bold;
+      }
+    </style>
+
+    <app-location route="{{route}}" url-space-regex="^[[rootPath]]" use-hash-as-path></app-location>
+    <app-route
+        route="{{route}}"
+        pattern="[[rootPath]]:page"
+        data="{{routeData}}"
+        tail="{{subroute}}"></app-route>
+
+    
+       
+      <!--<app-drawer id="drawer" slot="drawer" swipe-open="[[narrow]]">
+        <app-toolbar>Menu</app-toolbar>
+        <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
+          <a name="view1" href="#[[rootPath]]view1">View One</a>
+          <a name="view2" href="#[[rootPath]]view2">View Two</a>
+          <a name="view3" href="#[[rootPath]]view3">View Three</a>
+        </iron-selector>
+      </app-drawer>-->
+
+      <!-- Main content -->
+      <app-header-layout id="appHeaderLayout" >
+
+        <app-header id="header" slot="header">
+          <app-toolbar >
+            <template is="dom-if" if="{{isShowHeaderAction}}">
+              <paper-icon-button icon=""></paper-icon-button>
+            </template>
+            <div main-title style="text-align: center;">[[pageName]]</div>
+            <template is="dom-if" if="{{isShowHeaderAction}}">
+              <paper-icon-button icon="close" on-tap="_close"></paper-icon-button>
+            </template>
+          </app-toolbar>
+        </app-header>
+
+        <iron-pages style="background-color: white"
+            selected="[[page]]"
+            attr-for-selected="name"
+            fallback-selection="view404"
+            role="main">
+          <my-view1 id="myView1" name="view1" selected-photo="{{selectedPhoto}}" photo-transition = "{{photoTransition}}" items="{{photos}}"></my-view1>
+          <my-view2 id="myView2" on-tap="_toggleViewMode" name="view2" view-mode="[[viewMode]]" selected-photo="{{selectedPhoto}}" photo-transition = "[[photoTransition]]" photos="{{photos}}"></my-view2>
+          <my-view3 name="view3"></my-view3>
+          <my-view404 name="view404"></my-view404>
+        </iron-pages>
+      </app-header-layout>
+    
+  </template>
+
+  <script>
+    class MyApp extends Polymer.GestureEventListeners(Polymer.Element) {
+      static get is() { return 'my-app'; }
+
+      static get properties() {
+        return {
+          viewMode:{
+            type:Boolean,
+            value:false
+          },
+          page: {
+            type: String,
+            reflectToAttribute: true,
+            observer: '_pageChanged',
+          },
+          routeData: Object,
+          subroute: String,
+          // This shouldn't be neccessary, but the Analyzer isn't picking up
+          // Polymer.Element#rootPath
+          rootPath: String,
+          isShowHeaderAction:{
+            type:Boolean,
+            value:{type: Boolean,
+                  value: true}
+          },
+          selectedPhoto:{
+            type:Object,
+            notify:true,
+            observer:"_selectedPhotoChanged"
+          },
+          pageName:{
+             type:String   
+          },
+          photoTransition:{
+            type:Object,
+            notify:true,
+            observer:"_photoTransitionChanged"
+          },
+          photos:{
+            type:Array,
+            notify:true
+          }
+
+        };
+      }
+
+      static get observers() {
+        return [
+          '_routePageChanged(routeData.page)',
+        ];
+      }
+
+       getSeletedPhotoIndex(){
+        return this.photos.map((e)=>e.url).indexOf(this.selectedPhoto.url);
+          
+      }
+
+      _selectedPhotoChanged(){
+        console.log("haha");
+        this.pageName = this.selectedPhoto.title;
+      }
+
+      _photoTransitionChanged(){
+        //console.log(this.photoTransition);
+      }
+
+      _routePageChanged(page) {
+ 
+        // If no page was found in the route data, page will be an empty string.
+        // Deault to 'view1' in that case.
+        this.page = page || 'view1';
+        this.isShowHeaderAction = (this.page=='view2');
+        if(this.page=="view1"&&this.viewMode){
+          //console.log(this.viewMode);
+          var header = this.$.header;
+          var appHeaderLayout = this.$.appHeaderLayout;
+          header.style.transform = "translateY(0)";
+          appHeaderLayout.style.backgroundColor = "white";
+          this.viewMode = false;
+          //this._toggleAppBar(true);
+        }
+
+        //upadte title
+               if(this.page == "view1")
+                this.pageName = "Gallery";
+        else{
+          if(this.selectedPhoto)
+            this.pageName= this.selectedPhoto.title;
+          else
+            this.pageName =  "";
+        }
+
+        // Close a non-persistent drawer when the page & route are changed.
+        // if (!this.$.drawer.persistent) {
+        //   this.$.drawer.close();
+        // }
+        //if(this.page == 'view1')
+
+      }
+
+      _close(){
+
+        var target = this.$.myView2.$.detailPhoto;
+        console.log(target);
+        target.nextSibling.nextSibling.style.opacity = 0;
+        target.previousSibling.previousSibling.style.opacity = 0;
+        this.zoomOut(target,function(){
+          window.location.href="#/view1";
+          target.nextSibling.nextSibling.style.opacity = 1;
+        target.previousSibling.previousSibling.style.opacity = 1;
+        });
+      }
+
+      zoomOut(target, callback){
+
+        if(!this.photoTransition){
+          callback();
+          return;
+        }
+        // var oldTransform = this.photoTransition.to.transform;
+        // oldTransform = oldTransform.substring(oldTransform.indexOf('(')+1,oldTransform.indexOf(')'))+",";
+        // var newTransform = oldTransform.split("px,");
+
+        var yTranslate = 0-(target.getBoundingClientRect().top + 65 +12 -this.photos[this.getSeletedPhotoIndex()].position.top - (this.photos[this.getSeletedPhotoIndex()].position.bottom - this.photos[this.getSeletedPhotoIndex()].position.top)/2 + (target.getBoundingClientRect().bottom-target.getBoundingClientRect().top)/2) ;
+        
+        this.$.myView2.$.footer.animate(
+          [
+          {opacity:1},
+          {opacity:0}
+          ],{ 
+            duration:200,
+            easing:"ease-in-out"
+          }
+          );
+        var shrink = target.animate(
+          [
+          {
+            transform:"translate(0px,0px)",
+             width:this.photoTransition.to.width,
+             height:this.photoTransition.to.height          
+           },
+          {
+            transform:"translate("+(this.photos[this.getSeletedPhotoIndex()].position.left - this.getBoundingClientRect().left)+"px,"+yTranslate+"px)",
+             width:this.photoTransition.from.width,
+             height:this.photoTransition.from.height          
+           }
+          ],{ 
+            duration:200,
+            easing:"ease-in-out"
+          }
+          
+          );
+
+       
+
+         shrink.onfinish = function(){
+          callback();
+         };
+      }
+
+      _pageChanged(page) {
+                // Load page import on demand. Show 404 page if fails
+        var resolvedPageUrl = this.resolveUrl('my-' + page + '.html');
+        Polymer.importHref(
+            resolvedPageUrl,
+            null,
+            this._showPage404.bind(this),
+            true);
+      }
+
+      _showPage404() {
+        this.page = 'view404';
+      }
+
+      _toggleViewMode(e){
+     
+        if(e.detail.sourceEvent.target.id=="detailViewContainer"||e.detail.sourceEvent.target.id=="detailPhoto"){
+          this._toggleAppBar();
+        }      
+        
+      }
+
+      _toggleAppBar(){
+      
+
+        var header = this.$.header;
+        var appHeaderLayout = this.$.appHeaderLayout;
+        if(!this.viewMode){
+            var hidding = header.animate(
+              [
+                {transform:"translateY(0)"},
+                {transform:"translateY(-64px)"}
+              ],
+              {
+                duration:200
+              });
+
+            var dimming = appHeaderLayout.animate(
+              [
+                {backgroundColor:"white"},
+                {backgroundColor:"black"}
+              ],
+              {
+                duration:200
+              });
+
+            hidding.onfinish = function(){
+              header.style.transform = "translateY(-64px)";
+              appHeaderLayout.style.backgroundColor = "black";
+            }
+            this.viewMode = !this.viewMode;
+
+          }else{
+            var hidding = header.animate(
+              [
+                {transform:"translateY(-64px)"},
+                {transform:"translateY(0)"}
+              ],
+              {
+                duration:200
+              });
+
+             var dimming = appHeaderLayout.animate(
+                [
+                  {backgroundColor:"black"},
+                  {backgroundColor:"white"}
+                ],
+                {
+                  duration:200
+                });
+
+              hidding.onfinish = function(){
+                header.style.transform = "translateY(0)";
+                appHeaderLayout.style.backgroundColor = "white";
+               
+              }
+
+              this.viewMode = !this.viewMode;
+
+          }  
+      }
+    }
+
+    window.customElements.define(MyApp.is, MyApp);
+  </script>
+</dom-module>

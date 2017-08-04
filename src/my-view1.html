@@ -1,0 +1,240 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../bower_components/iron-image/iron-image.html">
+<link rel="import" href="../bower_components/neon-animation/web-animations.html">
+<link rel="import" href="../bower_components/polymer/lib/mixins/gesture-event-listeners.html">
+
+
+<dom-module id="my-view1">
+  <template>
+    <style include="shared-styles">
+      :host {
+       height: calc(100vh - 65px);
+       display: flex;
+       flex-direction: column;
+       background-color: white;
+  
+      }
+
+      iron-list {
+       flex: 1 1 auto;
+      }
+
+      .itemContainer {
+          width: calc(33vw );
+          height: calc(33vw );     
+        }
+
+       .item {
+         background-color: #eee;
+         height:calc(100% - 2px);
+         margin:2px 2px 2px 2px;
+       } 
+
+       iron-image {
+        height:100%;
+        width:100%;
+        background-color: #eee;
+       }
+
+    </style>
+
+    <iron-list id="gallery" items="[[items]]" as="photo" grid>
+      <template>
+         <div class="itemContainer" on-tap="onSelect" data-item$="[[photo]]">
+            <div class="item">
+            <iron-image src=[[photo.url]] sizing="cover" preload fade></iron-image>
+            </div>
+         </div>
+      </template>
+   </iron-list>
+    
+  </template>
+
+  <script>
+    class MyView1 extends Polymer.GestureEventListeners(Polymer.Element) {
+      static get is() { return 'my-view1'; }
+
+      static get properties() {
+        return {
+          selectedPhoto:{
+            type:Object,
+            notify:true
+          },
+          photoTransition:{
+            type:Object,
+            notify:true
+          },
+          items: {
+            type: Array,
+            readOnly: true,
+            notify: true,
+            value:function(){
+              return [
+                {
+                  url:"../images/diamon_head.jpg",
+                  title:"Diamon Head"
+                 },{
+                  url:"../images/grand_teton.jpg",
+                  title:"Grand Teton1"
+                 },{
+                  url:"../images/grand_teton2.jpg",
+                  title:"Grand Teton2"
+                 },{
+                  url:"../images/gyser.jpg",
+                  title:"Yellow Stone Gyser 1"
+                 },{
+                  url:"../images/gyser2.jpg",
+                  title:"Yellow Stone Gyser 2"
+                 },{
+                  url:"../images/gyser3.jpg",
+                  title:"Yellow Stone Gyser 3"
+                 },{
+                  url:"../images/kailua_beach.png",
+                  title:"Kailua Beach"
+                 },{
+                  url:"../images/mamouth.jpg",
+                  title:"Yellow Stone Mamouth"
+                 },{
+                  url:"../images/observatory.jpg",
+                  title:"Observatory"
+                 },{
+                  url:"../images/puu.jpg",
+                  title:"Kauai Island"
+                 },{
+                  url:"../images/star.jpg",
+                  title:"Yellow Stone Night"
+                 },{
+                  url:"../images/volcano.jpg",
+                  title:"Volcano"
+                 },
+                 {
+                  url:"../images/castle.jpg",
+                  title:"Castle"
+                 },
+                 {
+                  url:"../images/disney.jpg",
+                  title:"Disney"
+                 },
+                 {
+                  url:"../images/federer.jpg",
+                  title:"Roger Federer"
+                 },
+                 {
+                  url:"../images/waterfire.jpg",
+                  title:"Waterfire"
+                 },
+                 {
+                  url:"../images/provinetown.jpg",
+                  title:"Provincetown"
+                 }
+                      ];
+            }
+          }
+        }
+      }
+
+      onSelect(e){
+         this.getAllPhotoPosition();
+        if(e.target.parentNode.parentNode.dataset){
+          this.selectedPhoto = JSON.parse(e.target.parentNode.parentNode.dataset.item);
+          this.zoomIn(e.target.parentNode);
+        }
+       
+        //window.location.href="#/view2";
+       
+      }
+
+      zoomIn(target){
+        
+        var photoList = target.parentNode.parentNode.getElementsByClassName('item');
+ 
+
+        for (var i = 0; i < photoList.length; i++) {
+            if(photoList[i]!=target){
+
+            photoList[i].animate(
+              [
+              {opacity:1},
+              {opacity:0}
+              ],{duration:300}
+              );
+          }
+        }
+
+        var viewWidth = this.offsetWidth;
+        var viewHeight = this.offsetHeight + 65;
+       
+
+        var xOffset = viewWidth/2 - target.offsetWidth/2 - target.getBoundingClientRect().left;
+        var yOffset = viewHeight/2 - target.offsetHeight/2 - target.getBoundingClientRect().top - 65 -16;
+        
+        if(xOffset>target.offsetWidth)
+          xOffset = xOffset - target.offsetWidth- target.getBoundingClientRect().left -6;
+        else if(xOffset<=target.offsetWidth&&xOffset>=0){
+          xOffset = -xOffset-target.offsetWidth - 8;
+        }
+        else
+          xOffset = 2*xOffset-4;
+
+     
+        var parent = target.parentNode;
+        parent.style.zIndex = 10; 
+       
+        var photoTransition = {
+          from:{
+            transform:"translate(0px,0px)",
+             width:target.offsetWidth+"px",
+             height:target.offsetHeight+"px"          
+           },
+          to:{
+              transform:"translate("+xOffset+"px,"+yOffset+"px)",
+              width:viewWidth+"px",
+              height:viewWidth*3/4 + "px"
+          }
+        }
+        this.photoTransition = photoTransition;
+        var enLarge = target.animate(
+          [
+            photoTransition.from,
+            photoTransition.to
+           ],
+           { 
+            duration:300,
+            easing:"ease-in-out"
+          });
+
+        enLarge.onfinish = function(){
+            window.location.href="#/view2";
+            parent.style.zIndex = 0; 
+
+        };
+      }
+
+      getAllPhotoPosition(){
+        var photoPositions = this.$.gallery.getElementsByTagName("iron-image");
+        this.items.forEach(function(e,i){
+           if(!photoPositions[i])
+              return;
+            e.position = photoPositions[i].getBoundingClientRect();
+        });
+        
+      }
+
+      
+    }
+
+    window.customElements.define(MyView1.is, MyView1);
+  </script>
+</dom-module>
