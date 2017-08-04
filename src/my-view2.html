@@ -74,7 +74,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         background-color: white;
       }
 
-     
+      
 
     </style>
     <canvas id="canvas" ></canvas>
@@ -91,132 +91,132 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        <paper-icon-button icon="image:exposure-plus-1"></paper-icon-button>
        <span style="flex:1"></span>
        <paper-icon-button icon="speaker-notes"></paper-icon-button> 
-        <span style="flex:1"></span>  
+       <span style="flex:1"></span>  
        <paper-icon-button icon="add"></paper-icon-button>  
-        <span style="flex:1"></span>
+       <span style="flex:1"></span>
        <paper-icon-button icon="social:share"></paper-icon-button>   
-      </app-toolbar>
-    </div>
-  </template>
+     </app-toolbar>
+   </div>
+ </template>
 
-  <script>
-    class MyView2 extends Polymer.GestureEventListeners(Polymer.Element) {
-      static get is() { return 'my-view2'; }
+ <script>
+  class MyView2 extends Polymer.GestureEventListeners(Polymer.Element) {
+    static get is() { return 'my-view2'; }
 
-      static get properties() {
-        return {
-          photoTransition:{
-            type:Object,
-            notify:true
-          },
-          viewMode:{
-            type:Boolean,
-            notify:true,
-            observer: '_viewModeChanged'
-          },
-          selectedPhoto:{
-            type:Object,
-            notify:true,
-            observer:'_selectedPhotoChanged'
-          },
-          nextPhoto:{
-            type:Object
-          },
-          prevPhoto:{
-            type:Object
-          },
-          status:{
-            type:String
-          },
-          photos:{
-            type:Array,
-            notify:true
-          }
+    static get properties() {
+      return {
+        photoTransition:{
+          type:Object,
+          notify:true
+        },
+        viewMode:{
+          type:Boolean,
+          notify:true,
+          observer: '_viewModeChanged'
+        },
+        selectedPhoto:{
+          type:Object,
+          notify:true,
+          observer:'_selectedPhotoChanged'
+        },
+        nextPhoto:{
+          type:Object
+        },
+        prevPhoto:{
+          type:Object
+        },
+        status:{
+          type:String
+        },
+        photos:{
+          type:Array,
+          notify:true
         }
       }
+    }
 
 
-      _selectedPhotoChanged(){
+    _selectedPhotoChanged(){
+      
+      var self = this;
+      var index = this.getSeletedPhotoIndex();
+      if(index!=this.photos.length-1){
         
-        var self = this;
-        var index = this.getSeletedPhotoIndex();
-        if(index!=this.photos.length-1){
+        self.nextPhoto = self.photos[index+1];
         
-            self.nextPhoto = self.photos[index+1];
-                   
-        }
-        if(index!=0){
-          
-            self.prevPhoto = self.photos[index-1];
+      }
+      if(index!=0){
         
-        }
-
-        this.generateScreenShot();
+        self.prevPhoto = self.photos[index-1];
+        
       }
 
-      _viewModeChanged(){
+      this.generateScreenShot();
+    }
+
+    _viewModeChanged(){
             //reset viewmode
-        if(this.viewMode==false){
-          var footer = this.$.footer;
-          var glass = this.$.glass;
-          footer.style.transform = "translateY(0)";
-          glass.style.backgroundColor = "white";
-        }
-      }
+            if(this.viewMode==false){
+              var footer = this.$.footer;
+              var glass = this.$.glass;
+              footer.style.transform = "translateY(0)";
+              glass.style.backgroundColor = "white";
+            }
+          }
 
 
-      slideShowMode(){
-        this.toggleFooter();
-      }
+          slideShowMode(){
+            this.toggleFooter();
+          }
 
-      toggleFooter(){
-       
-        var footer = this.$.footer;
-        var glass = this.$.glass;
+          toggleFooter(){
+           
+            var footer = this.$.footer;
+            var glass = this.$.glass;
 
-        if(!this.viewMode){
-            var hidding = footer.animate(
-              [
+            if(!this.viewMode){
+              var hidding = footer.animate(
+                [
                 {transform:"translateY(0)"},
                 {transform:"translateY(64px)"}
-              ],
-              {
-                duration:200
-              });
+                ],
+                {
+                  duration:200
+                });
 
-            var dimming = glass.animate(
-              [
+              var dimming = glass.animate(
+                [
                 {backgroundColor:"white"},
                 {backgroundColor:"black"}
-              ],
-              {
-                duration:200
-              });
+                ],
+                {
+                  duration:200
+                });
 
-            hidding.onfinish = function(){
-              footer.style.transform = "translateY(64px)";
-              glass.style.backgroundColor = "black";
-            }
-            this.viewMode = !this.viewMode;
+              hidding.onfinish = function(){
+                footer.style.transform = "translateY(64px)";
+                glass.style.backgroundColor = "black";
+              }
+              this.viewMode = !this.viewMode;
 
-          }else{
-            var hidding = footer.animate(
-              [
+            }else{
+              var hidding = footer.animate(
+                [
                 {transform:"translateY(64px)"},
                 {transform:"translateY(0)"}
-              ],
-              {
-                duration:200
-              });
+                ],
+                {
+                  duration:200
+                });
 
-            var dimming = glass.animate(
-              [
+              var dimming = glass.animate(
+                [
                 {backgroundColor:"black"},
                 {backgroundColor:"white"}
-              ],
-              {
-                duration:200
-              });
+                ],
+                {
+                  duration:200
+                });
 
               hidding.onfinish = function(){
                 footer.style.transform = "translateY(0)";
@@ -224,59 +224,59 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               }
 
               this.viewMode = !this.viewMode;
-  
+              
 
-          }  
-      }
-
-      handleTracks(e){
-        var track = this.$.imageTrack;
-        switch(e.detail.state) {
-          case 'start':
-            
-            break;
-          case 'track':
-            if(this.status =="dragging")
-              return;
-            track.style.left = e.detail.dx +"px";
-          
-            break;
-          case 'end':
-            
-            if(e.detail.dx >= screen.width/3)
-              this.movePrev(track,e.detail.dx);
-            else if(e.detail.dx <= -1 * screen.width/3)
-              this.moveNext(track,e.detail.dx);
-            else
-              this.stay(track,e.detail.dx);
-            break;
-        }
-      }
-
-      getSeletedPhotoIndex(){
-        return this.photos.map((e)=>e.url).indexOf(this.selectedPhoto.url);
-          
-      }
-
-      moveNext(target,dx){
-        if(this.status == "dragging")
-          return;
-        var self = this;
-        console.log("next: "+dx);
-        var next = target.animate(
-          [
-          {transform:"translateX("+(-1*screen.width)+"px)"},
-          {transform:"translateX("+(-2*screen.width-dx)+"px)"}
-          ],{duration:300,easing:"ease-in-out"}
-          );
-        console.log("translateX("+dx+"px)");
-        next.onfinish = function(){
-          console.log("finish");
-          target.style.left = "0px";
-          var index = self.getSeletedPhotoIndex();
-          if(index!=self.photos.length-1){
-            self.selectedPhoto = self.photos[index+1];
+            }  
           }
+
+          handleTracks(e){
+            var track = this.$.imageTrack;
+            switch(e.detail.state) {
+              case 'start':
+              
+              break;
+              case 'track':
+              if(this.status =="dragging")
+                return;
+              track.style.left = e.detail.dx +"px";
+              
+              break;
+              case 'end':
+              
+              if(e.detail.dx >= screen.width/3)
+                this.movePrev(track,e.detail.dx);
+              else if(e.detail.dx <= -1 * screen.width/3)
+                this.moveNext(track,e.detail.dx);
+              else
+                this.stay(track,e.detail.dx);
+              break;
+            }
+          }
+
+          getSeletedPhotoIndex(){
+            return this.photos.map((e)=>e.url).indexOf(this.selectedPhoto.url);
+            
+          }
+
+          moveNext(target,dx){
+            if(this.status == "dragging")
+              return;
+            var self = this;
+            
+            var next = target.animate(
+              [
+              {transform:"translateX("+(-1*screen.width)+"px)"},
+              {transform:"translateX("+(-2*screen.width-dx)+"px)"}
+              ],{duration:300,easing:"ease-in-out"}
+              );
+            
+            next.onfinish = function(){
+
+              target.style.left = "0px";
+              var index = self.getSeletedPhotoIndex();
+              if(index!=self.photos.length-1){
+                self.selectedPhoto = self.photos[index+1];
+              }
           //
           
           
@@ -287,15 +287,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       movePrev(target,dx){
         if(this.status == "dragging")
           return;
-        console.log("prev");
-         var self = this;
+        
+        var self = this;
         var prev = target.animate(
           [
           {transform:"translateX("+(-1*screen.width)+"px)"},
           {transform:"translateX("+(-1*screen.width + dx/2)+"px)"}
           ],{duration:300,easing:"ease-in-out"}
           );
-       
+        
         prev.onfinish = function(){
           target.style.left = "0px";
           var index = self.getSeletedPhotoIndex();
@@ -309,7 +309,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       stay(target,dx){
         if(this.status == "dragging")
           return;
-        console.log("stay: "+dx);
+        
         
 
         var restore = target.animate(
@@ -339,8 +339,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         restore.onfinish = function(){
           target.style.left = "0px";
           target.style.top = "0px";
-          console.log(target.getBoundingClientRect().top);
-          console.log(self.$.imageTrack.getBoundingClientRect().top);
+          
           
         };
       }
@@ -350,66 +349,64 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         switch(e.detail.state) {
           case 'start':
             //status = "started";
-            //console.log('Tracking started!');
+
             break;
-          case 'track':
+            case 'track':
             
              //console.log('Tracking in progress... ' +e.detail.x + ', ' + e.detail.y);
              movePhoto(this.$.detailPhoto,e.detail.dx,e.detail.dy,e.detail.ddx,e.detail.ddy);
-            break;
-          case 'end':
-            
+             break;
+             case 'end':
+             
              //console.log('Tracking ended!');
              if(self.status == "swiping"){
               self.status = "end";
-                return;
-             }
-             console.log("?: "+Math.abs(e.detail.dy));
-             if(self.status == "dragging" && Math.abs(e.detail.dy) <= 20){
+              return;
+            }
+            
+            if(self.status == "dragging" && Math.abs(e.detail.dy) <= 20){
               
-                self.status = "end";
-                self.stayForDragging(this.$.detailPhoto,e.detail.dx,e.detail.dy);
-                self.$.detailPhoto.nextSibling.nextSibling.style.opacity = 1;
-               self.$.detailPhoto.previousSibling.previousSibling.style.opacity = 1;
-               self.$.glass.style.opacity = 1;
-                return;
-             }
-             
-             this.zoomOut(this.$.detailPhoto,e.detail.dx,function(){
-               window.location.href="#/view1";
-               self.status = "end";
-               self.$.detailPhoto.nextSibling.nextSibling.style.opacity = 1;
-               self.$.detailPhoto.previousSibling.previousSibling.style.opacity = 1;
-               self.$.glass.style.opacity = 1;
-               self.$.footer.style.transform = "translateY(0px)";
-               self.viewMode = false;
-             });
+              self.status = "end";
+              self.stayForDragging(this.$.detailPhoto,e.detail.dx,e.detail.dy);
+              self.$.detailPhoto.nextSibling.nextSibling.style.opacity = 1;
+              self.$.detailPhoto.previousSibling.previousSibling.style.opacity = 1;
+              self.$.glass.style.opacity = 1;
+              return;
+            }
+            
+            this.zoomOut(this.$.detailPhoto,e.detail.dx,function(){
+             window.location.href="#/view1";
+             self.status = "end";
+             self.$.detailPhoto.nextSibling.nextSibling.style.opacity = 1;
+             self.$.detailPhoto.previousSibling.previousSibling.style.opacity = 1;
+             self.$.glass.style.opacity = 1;
+             self.$.footer.style.transform = "translateY(0px)";
+             self.viewMode = false;
+           });
             break;
-        }
-
-           function swipePhoto(target,dx,dy,ddx,ddy){
-            //console.log(self.status);
-            //target.style.left = dx +"px";
           }
 
-           function dragPhoto(target,dx,dy,ddx,ddy){
-            console.log(self.status);
+          function swipePhoto(target,dx,dy,ddx,ddy){
+
+          }
+
+          function dragPhoto(target,dx,dy,ddx,ddy){
+
             self.pendingZoomout(dy);
             target.nextSibling.nextSibling.style.opacity = 0;
             target.previousSibling.previousSibling.style.opacity = 0;
-            //console.log(target.nextSibling.nextSibling.id);
-            //console.log(target.previousSibling.previousSibling.id);
+
             target.style.left = dx +"px";
             target.style.top = dy +"px";
 
             //update transition
-             var oldTransform = self.photoTransition.to.transform;
+            var oldTransform = self.photoTransition.to.transform;
             oldTransform = oldTransform.substring(oldTransform.indexOf('(')+1,oldTransform.indexOf(')'))+",";
             var newTransform = oldTransform.split("px,");
-        
+            
             self.set('photoTransition.to.transform',"translate("+(Number(newTransform[0])+ddx)+"px,"+(Number(newTransform[1])+ddy)+"px)");
 
-    
+            
 
 
             if(Math.abs(dy)>=20){
@@ -420,7 +417,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
           }
 
-           function movePhoto(target,dx,dy,ddx,ddy){
+          function movePhoto(target,dx,dy,ddx,ddy){
             
             if(ddy<=5&&ddy>=-5&&self.status!="dragging"){
               self.status = "swiping";
@@ -431,84 +428,84 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               dragPhoto(target,dx,dy,ddx,ddy);
             }
 
-           
             
             
+            
           }
 
-      }
-
-      backIndication(isHiding, dy){
-        if(isHiding){
- 
-          if(this.viewMode == false){
-              
-          }else{
-
-            return;
-          }
-          
         }
-        else{
-         
-           if(this.viewMode == true){       
-              
-          }else{
-           return;
+
+        backIndication(isHiding, dy){
+          if(isHiding){
            
-          }
-        }
+            if(this.viewMode == false){
+              
+            }else{
 
-        var footer = this.$.footer;
-   
-        if(!this.viewMode){
-            var hidding = footer.animate(
-              [
-                {transform:"translateY(0)"},
-                {transform:"translateY(65px)"}
-              ],
-              {
-                duration:200
-              });
-
-  
-
-            hidding.onfinish = function(){
-              footer.style.transform = "translateY(65px)";
-
+              return;
             }
-            this.viewMode = !this.viewMode;
-
-          }else{
-            var hidding = footer.animate(
-              [
-                {transform:"translateY(65px)"},
-                {transform:"translateY(0)"}
-              ],
-              {
-                duration:200
-              });
-
             
+          }
+          else{
+           
+           if(this.viewMode == true){       
+            
+           }else{
+             return;
+             
+           }
+         }
 
-              hidding.onfinish = function(){
-                footer.style.transform = "translateY(0)";
-              }
+         var footer = this.$.footer;
+         
+         if(!this.viewMode){
+          var hidding = footer.animate(
+            [
+            {transform:"translateY(0)"},
+            {transform:"translateY(65px)"}
+            ],
+            {
+              duration:200
+            });
 
-              this.viewMode = !this.viewMode;
-  
+          
 
-          } 
+          hidding.onfinish = function(){
+            footer.style.transform = "translateY(65px)";
+
+          }
+          this.viewMode = !this.viewMode;
+
+        }else{
+          var hidding = footer.animate(
+            [
+            {transform:"translateY(65px)"},
+            {transform:"translateY(0)"}
+            ],
+            {
+              duration:200
+            });
+
+          
+
+          hidding.onfinish = function(){
+            footer.style.transform = "translateY(0)";
+          }
+
+          this.viewMode = !this.viewMode;
+          
+
+        } 
       }
 
-     
+      
 
       zoomOut(target, dx, callback){
-         
-         if(!this.photoTransition){
-          callback();
-          return;
-        }
+       
+       if(!this.photoTransition){
+        callback();
+        return;
+      }
         // var oldTransform = this.photoTransition.to.transform;
         // oldTransform = oldTransform.substring(oldTransform.indexOf('(')+1,oldTransform.indexOf(')'))+",";
         // var newTransform = oldTransform.split("px,");
@@ -516,7 +513,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         var yTranslate = 0-(target.getBoundingClientRect().top + 65 +12 -this.photos[this.getSeletedPhotoIndex()].position.top - (this.photos[this.getSeletedPhotoIndex()].position.bottom - this.photos[this.getSeletedPhotoIndex()].position.top)/2 + (target.getBoundingClientRect().bottom-target.getBoundingClientRect().top)/2) ;
 
-        console.log("offset: "+(this.photos[this.getSeletedPhotoIndex()].position.left - this.getBoundingClientRect().left));
+        
         this.$.footer.animate(
           [
           {opacity:1},
@@ -530,29 +527,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var shrink = target.animate(
           [
           {
-             transform:"translate(0px,0px)",
-             width:this.photoTransition.to.width,
-             height:this.photoTransition.to.height          
-           },
-          {
-            transform:"translate("+(this.photos[this.getSeletedPhotoIndex()].position.left - this.getBoundingClientRect().left - dx)+"px,"+yTranslate+"px)",
-             width:this.photoTransition.from.width,
-             height:this.photoTransition.from.height          
-           }
-          ],{ 
-            duration:200,
-            easing:"ease-in-out"
-          }
-          
-          );
+           transform:"translate(0px,0px)",
+           width:this.photoTransition.to.width,
+           height:this.photoTransition.to.height          
+         },
+         {
+          transform:"translate("+(this.photos[this.getSeletedPhotoIndex()].position.left - this.getBoundingClientRect().left - dx)+"px,"+yTranslate+"px)",
+          width:this.photoTransition.from.width,
+          height:this.photoTransition.from.height          
+        }
+        ],{ 
+          duration:200,
+          easing:"ease-in-out"
+        }
+        
+        );
 
         
-         shrink.onfinish = function(){
-          console.log("finish");
+        shrink.onfinish = function(){
+
           callback();
           target.style.left =0+"px";
           target.style.top =0+"px";
-         };
+        };
       }
 
       pendingZoomout(dy){
@@ -563,13 +560,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       generateScreenShot(){
         
-      
+        
         var self = this;
         this.$.canvas.width= screen.width;
         this.$.canvas.height = screen.height;
-         var ctx = this.$.canvas.getContext('2d');
-                
-                this.photos.forEach(function(e){
+        var ctx = this.$.canvas.getContext('2d');
+        
+        this.photos.forEach(function(e){
                   var img = new Image(); //creates a variable for a new image
                   img.src = e.url;
                   img.onload = function() {
@@ -577,12 +574,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     if(!e.position||e.url == self.selectedPhoto.url){
                       return;
                     }
-                     
+                    
                     ctx.drawImage(img, e.position.left, e.position.top, (e.position.right - e.position.left),(e.position.bottom-e.position.top));// draws the image at the specified x and y location
-                }
+                  }
                 });
-    
-      
+        
+        
       }
 
     }
