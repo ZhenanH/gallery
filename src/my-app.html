@@ -198,7 +198,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           header.style.transform = "translateY(0)";
           appHeaderLayout.style.backgroundColor = "white";
           this.viewMode = false;
-          //this._toggleAppBar(true);
+   
         }
 
         //upadte title
@@ -214,6 +214,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       }
 
+      //close detailed view
       _close(){
 
         var target = this.$.myView2.$.detailPhoto;
@@ -228,6 +229,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         });
       }
 
+      //animation for closing detailed view
       zoomOut(target, callback){
 
         if(!this.photoTransition){

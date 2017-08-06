@@ -24,7 +24,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        display: flex;
        flex-direction: column;
        background-color: white;
-       
+
      }
 
      iron-list {
@@ -151,15 +151,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       this.selectedPhoto = JSON.parse(e.target.parentNode.parentNode.dataset.item);
       this.zoomIn(e.target.parentNode);
     }
-    
-        //window.location.href="#/view2";
-        
+
+       
+
       }
 
       zoomIn(target){
-        
+
         var photoList = target.parentNode.parentNode.getElementsByClassName('item');
-        
+
 
         for (var i = 0; i < photoList.length; i++) {
           if(photoList[i]!=target){
@@ -175,7 +175,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         var viewWidth = this.offsetWidth;
         var viewHeight = this.offsetHeight + 65;
-        
+
         var margin =  screen.width*0.01;
 
         var xOffset = viewWidth/2 - target.offsetWidth/2 - target.getBoundingClientRect().left;
@@ -188,10 +188,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         else
           xOffset = 2*xOffset-margin;
 
-        
+
         var parent = target.parentNode;
         parent.style.zIndex = 10; 
-        
+
         var photoTransition = {
           from:{
             transform:"translate(0px,0px)",
